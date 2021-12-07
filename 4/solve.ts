@@ -59,7 +59,7 @@ function tick() {
   // Remove winning boards
   remainingBoards = remainingBoards.filter(board => !winners.includes(board));
 }
-let winner: typeof remainingBoards[number] | null = null;
+
 while (remainingBoards.length > 0 && remainingNumbers.length > 0) {
   tick();
 }

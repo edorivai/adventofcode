@@ -22,8 +22,7 @@ const gamma = parseInt(
     .join(""),
   2
 );
-const flipper = Array.from({ length: binaryDigitLength })
-  .map(() => "1")
+const flipper = Array(binaryDigitLength).fill( "1")
   .join("");
 const epsilon = gamma ^ parseInt(flipper, 2);
 
