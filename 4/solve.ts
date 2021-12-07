@@ -4,16 +4,16 @@ import fs from "fs";
 const filename = __dirname + '/input.txt';
 const file = fs.readFileSync(filename, { encoding: "utf-8" });
 const chunks = file.split("\n\n");
-const drawnNumbers = chunks[0].split(",").map(Number);
-const boards = chunks
+const remainingNumbers = chunks[0].split(",").map(Number);
+let remainingBoards = chunks
   .slice(1)
   .map((b) =>
     b.split("\n").map((row) => row.split(/\s+/).filter(Boolean).map(Number))
   );
 
 function resolveRound() {
-  const num = drawnNumbers.shift();
-  return boards.find((board) =>
+  const num = remainingNumbers.shift();
+  const winningBoards = remainingBoards.filter((board) =>
     board.some((row) => {
       const match = row.some((value, colIndex) => {
         if (value !== num) return false;
@@ -31,6 +31,7 @@ function resolveRound() {
       );
     })
   );
+  return winningBoards;
 }
 
 let round = 0;
@@ -40,27 +41,27 @@ function tick() {
   // console.log("drawn numbers remaining");
   // console.log(drawnNumbers);
   console.log("drawn number");
-  drawnNumber = drawnNumbers[0];
+  drawnNumber = remainingNumbers[0];
   console.log(drawnNumber);
-  const winner = resolveRound();
+  const winners = resolveRound();
   // console.log("boards after round");
   // console.log(boards);
-  if (winner) {
-    console.log("winner");
+  winners.forEach(winner => {
+    console.log("WINNER!");
     console.log(winner);
-  }
 
-  return winner ?? null;
+    const sumOfRemainingNumbers = sum(
+      winner.map((row) => sum(row.filter(Boolean)))
+    );
+    console.log("Winner score:", sumOfRemainingNumbers * drawnNumber);
+  });
+
+  // Remove winning boards
+  remainingBoards = remainingBoards.filter(board => !winners.includes(board));
 }
-let winner: typeof boards[number] | null = null;
-while (!((winner = tick())) && drawnNumbers.length > 0) {}
-
-if (winner) {
-  console.log("WINNER SCORE");
-  const sumOfRemainingNumbers = sum(
-    winner.map((row) => sum(row.filter(Boolean)))
-  );
-  console.log(sumOfRemainingNumbers * drawnNumber);
+let winner: typeof remainingBoards[number] | null = null;
+while (remainingBoards.length > 0 && remainingNumbers.length > 0) {
+  tick();
 }
 
 function sum(numbers: number[]) {
